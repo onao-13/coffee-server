@@ -18,12 +18,12 @@ type Config struct {
 
 func UploadDevConfig() Config {
 	v := viper.New()
-	v.SetDefault("PORT", "8080")
-	v.SetDefault("DBNAME", "")
-	v.SetDefault("DBUSER", "")
-	v.SetDefault("DBPASS", "")
-	v.SetDefault("DBHOST", "")
-	v.SetDefault("DBPORT", "")
+	v.SetDefault("PORT", "8081")
+	v.SetDefault("DBNAME", "test")
+	v.SetDefault("DBUSER", "user")
+	v.SetDefault("DBPASS", "pass")
+	v.SetDefault("DBHOST", "localhost")
+	v.SetDefault("DBPORT", "8085")
 
 	var config Config
 
@@ -35,8 +35,9 @@ func UploadDevConfig() Config {
 	return config
 }
 
-func DbUrlConnection(config Config) string {
+func (config *Config) DbUrlConnection() string {
 	return fmt.Sprintf(
-		"h2://%s%s@%s%s/%s", config.DbUser, config.DbPass,
-		config.DbHost, config.DbPort, config.DbName)
+		"postgres://%s:%s@%s:%s/%s", config.DbUser,
+		config.DbPass, config.DbHost, config.DbPort, config.DbName,
+	)
 }

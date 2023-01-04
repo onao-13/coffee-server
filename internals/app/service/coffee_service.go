@@ -16,11 +16,22 @@ func NewCoffeeService(storage *data.CoffeeStorage) *CoffeeService {
 	return service
 }
 
-func (service *CoffeeService) FindCoffeeById(id int64) (model.Coffee, error) {
-	var err error
-	if id == 0 {
-		err = errors.New("id is 0")
+func (service *CoffeeService) FindById(id int64) (model.Coffee, error) {
+	return service.Storage.FindById(id)
+}
+
+func (service *CoffeeService) AddNew(coffee model.Coffee) error {
+	if coffee.Name == "" {
+		return errors.New("Coffee name is empty")
 	}
 
-	return service.Storage.FindCoffeeById(id), err
+	if coffee.Price == 0.0 {
+		return errors.New("Coffee price is empty")
+	}
+
+	return service.AddNew(coffee)
+}
+
+func (service *CoffeeService) GetAll() []model.Coffee {
+	return service.Storage.GetAll()
 }

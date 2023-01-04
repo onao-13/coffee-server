@@ -2,33 +2,50 @@ package data
 
 import (
 	model "coffee/internals/app/models"
+	"context"
+	"log"
+
+	"github.com/georgysavva/scany/pgxscan"
+	"github.com/jackc/pgx/v4/pgxpool"
 )
 
 type CoffeeStorage struct {
-	// pool
+	pool *pgxpool.Pool
 }
 
-func NewCoffeeStorage() *CoffeeStorage {
+func NewCoffeeStorage(pool *pgxpool.Pool) *CoffeeStorage {
 	storage := new(CoffeeStorage)
+	storage.pool = pool
 	return storage
 }
 
-func (data CoffeeStorage) FindCoffeeById(id int64) model.Coffee {
-	coffeesList := [4]model.Coffee{
-		model.New(1, "капучино", 3.25),
-		model.New(2, "латте", 2.80),
-		model.New(3, "эспрессо", 2.10),
-		model.New(4, "колд брю", 1.73),
+func (storage *CoffeeStorage) FindById(id int64) (model.Coffee, error) {
+	var coffee model.Coffee
+	query := "SELECT * FROM coffee WHERE id := $1"
+
+	err := pgxscan.Select(context.Background(), storage.pool, &coffee, query, id)
+
+	if err != nil {
+		log.Fatal("Error mapping")
 	}
 
-	var searchedCoffee model.Coffee
+	return coffee, err
+}
 
-	for _, coffee := range coffeesList {
-		if coffee.Id == id {
-			searchedCoffee = coffee
-			break
-		}
+func (storage *CoffeeStorage) AddNew(coffee model.Coffee) {
+	query := "INSERT INTO coffee (name, price) VALUES($1, $2)"
+	storage.pool.QueryRow(context.Background(), query, coffee.Name, coffee.Price)
+}
+
+func (storage *CoffeeStorage) GetAll() []model.Coffee {
+	var coffeeList []model.Coffee
+
+	query := "SELECT * FROM coffee"
+
+	err := pgxscan.Select(context.Background(), storage.pool, &coffeeList, query)
+	if err != nil {
+		log.Println(err)
 	}
 
-	return searchedCoffee
+	return coffeeList
 }

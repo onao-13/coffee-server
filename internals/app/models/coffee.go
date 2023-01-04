@@ -1,4 +1,4 @@
-package coffee
+package models
 
 type Coffee struct {
 	Id    int64   `json:"id"`

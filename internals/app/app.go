@@ -8,16 +8,18 @@ import (
 	config "coffee/internals/config"
 	"time"
 
+	"github.com/jackc/pgx/v4/pgxpool"
+
 	"context"
 	"log"
 	"net/http"
 )
 
 type Server struct {
-	cfg config.Config
-	ctx context.Context
-	srv *http.Server
-	// db
+	cfg  config.Config
+	ctx  context.Context
+	srv  *http.Server
+	pool *pgxpool.Pool
 }
 
 func NewServer(ctx context.Context, cfg config.Config) *Server {
@@ -29,12 +31,17 @@ func NewServer(ctx context.Context, cfg config.Config) *Server {
 
 func (server *Server) Connected() {
 	log.Println("Server starting")
+
 	var err error
+	server.pool, err = pgxpool.Connect(server.ctx, server.cfg.DbUrlConnection())
+
 	if err != nil {
-		log.Fatal("Database connection is faild")
+		log.Fatal("Database connection is failed")
 	}
 
-	coffeeStorage := data.NewCoffeeStorage()
+	defer server.pool.Close()
+
+	coffeeStorage := data.NewCoffeeStorage(server.pool)
 
 	coffeeService := service.NewCoffeeService(coffeeStorage)
 

@@ -3,6 +3,7 @@ package controller
 import (
 	model "coffee/internals/app/models"
 	service "coffee/internals/app/service"
+	"encoding/json"
 	"errors"
 	"log"
 	"net/http"
@@ -21,7 +22,7 @@ func NewCoffeeController(service *service.CoffeeService) *CoffeeController {
 	return controller
 }
 
-func (controller *CoffeeController) FindCoffeeById(response http.ResponseWriter, request *http.Request) {
+func (controller *CoffeeController) FindById(response http.ResponseWriter, request *http.Request) {
 	var coffee model.Coffee
 
 	vars := mux.Vars(request)
@@ -33,7 +34,7 @@ func (controller *CoffeeController) FindCoffeeById(response http.ResponseWriter,
 	id, err := strconv.ParseInt(vars["id"], 10, 64)
 	checkError(response, err)
 
-	coffee, err = controller.service.FindCoffeeById(id)
+	coffee, err = controller.service.FindById(id)
 	checkError(response, err)
 
 	var message = map[string]interface{}{
@@ -41,6 +42,25 @@ func (controller *CoffeeController) FindCoffeeById(response http.ResponseWriter,
 		"data":   coffee,
 	}
 
+	WrapOk(response, message)
+}
+
+func (controller *CoffeeController) AddNew(response http.ResponseWriter, request *http.Request) {
+	var coffee model.Coffee
+
+	err := json.NewDecoder(request.Body).Decode(coffee)
+	checkError(response, err)
+
+	err = controller.service.AddNew(coffee)
+	checkError(response, err)
+}
+
+func (controller *CoffeeController) GetAll(response http.ResponseWriter, request *http.Request) {
+	coffeeList := controller.service.GetAll()
+	var message = map[string]interface{}{
+		"status": "ok",
+		"data":   coffeeList,
+	}
 	WrapOk(response, message)
 }
 
