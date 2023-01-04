@@ -22,8 +22,8 @@ func UploadDevConfig() Config {
 	v.SetDefault("DBNAME", "test")
 	v.SetDefault("DBUSER", "user")
 	v.SetDefault("DBPASS", "pass")
-	v.SetDefault("DBHOST", "localhost")
-	v.SetDefault("DBPORT", "8085")
+	v.SetDefault("DBHOST", "postgres")
+	v.SetDefault("DBPORT", "5432")
 
 	var config Config
 
@@ -37,7 +37,7 @@ func UploadDevConfig() Config {
 
 func (config *Config) DbUrlConnection() string {
 	return fmt.Sprintf(
-		"postgres://%s:%s@%s:%s/%s", config.DbUser,
-		config.DbPass, config.DbHost, config.DbPort, config.DbName,
+		"postgres://%s:%s@%s/%s", config.DbUser,
+		config.DbPass, config.DbHost, config.DbName,
 	)
 }
