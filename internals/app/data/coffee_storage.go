@@ -23,7 +23,7 @@ func (storage *CoffeeStorage) FindById(id int64) (model.Coffee, error) {
 	var coffee model.Coffee
 	query := "SELECT * FROM coffee WHERE id := $1"
 
-	err := pgxscan.Select(context.Background(), storage.pool, &coffee, query, id)
+	err := pgxscan.Get(context.Background(), storage.pool, &coffee, query, id)
 
 	if err != nil {
 		log.Println("No coffees in database")
@@ -33,10 +33,27 @@ func (storage *CoffeeStorage) FindById(id int64) (model.Coffee, error) {
 	return coffee, err
 }
 
-func (storage *CoffeeStorage) AddNew(coffee model.Coffee) {
+func (storage *CoffeeStorage) AddNew(coffee model.Coffee) error {
+	ctx := context.Background()
+	tx, err := storage.pool.Begin(ctx)
+
 	query := "INSERT INTO coffee (name, price) VALUES($1, $2)"
-	storage.pool.QueryRow(context.Background(), query, coffee.Name, coffee.Price)
-	log.Print("Values: ", coffee.Name, coffee.Price)
+	_, err = tx.Exec(context.Background(), query, coffee.Name, coffee.Price)
+	if err != nil {
+		log.Println("Error added data")
+
+		err = tx.Rollback(ctx)
+		if err != nil {
+			log.Println("Error rollback")
+		}
+		return err
+	}
+
+	err = tx.Commit(ctx)
+	if err != nil {
+		log.Println("Error commit")
+	}
+	return err
 }
 
 func (storage *CoffeeStorage) GetAll() []model.Coffee {

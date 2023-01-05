@@ -31,6 +31,7 @@ func NewServer(ctx context.Context, cfg config.Config) *Server {
 
 func (server *Server) Connected() {
 	log.Println("Server starting")
+	time.Sleep(time.Duration(5) * time.Second)
 
 	var err error
 	server.pool, err = pgxpool.Connect(server.ctx, server.cfg.DbUrlConnection())
