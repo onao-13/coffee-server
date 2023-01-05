@@ -21,6 +21,7 @@ func (service *CoffeeService) FindById(id int64) (model.Coffee, error) {
 }
 
 func (service *CoffeeService) AddNew(coffee model.Coffee) error {
+	var err error
 	if coffee.Name == "" {
 		return errors.New("Coffee name is empty")
 	}
@@ -29,7 +30,8 @@ func (service *CoffeeService) AddNew(coffee model.Coffee) error {
 		return errors.New("Coffee price is empty")
 	}
 
-	return service.AddNew(coffee)
+	service.Storage.AddNew(coffee)
+	return err
 }
 
 func (service *CoffeeService) GetAll() []model.Coffee {

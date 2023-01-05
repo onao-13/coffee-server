@@ -48,7 +48,7 @@ func (controller *CoffeeController) FindById(response http.ResponseWriter, reque
 func (controller *CoffeeController) AddNew(response http.ResponseWriter, request *http.Request) {
 	var coffee model.Coffee
 
-	err := json.NewDecoder(request.Body).Decode(coffee)
+	err := json.NewDecoder(request.Body).Decode(&coffee)
 	checkError(response, err)
 
 	err = controller.service.AddNew(coffee)

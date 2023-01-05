@@ -11,7 +11,7 @@ COPY ./api/ ./api/
 COPY ./cmd/ ./
 COPY ./internals/ ./internals/
 
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build /coffee
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build
 
 # STAGE 2: DEPLOY
 FROM scratch

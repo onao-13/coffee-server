@@ -26,15 +26,17 @@ func (storage *CoffeeStorage) FindById(id int64) (model.Coffee, error) {
 	err := pgxscan.Select(context.Background(), storage.pool, &coffee, query, id)
 
 	if err != nil {
-		log.Fatal("Error mapping")
+		log.Println("No coffees in database")
 	}
 
+	log.Print("Values: ", coffee.Name, coffee.Price)
 	return coffee, err
 }
 
 func (storage *CoffeeStorage) AddNew(coffee model.Coffee) {
 	query := "INSERT INTO coffee (name, price) VALUES($1, $2)"
 	storage.pool.QueryRow(context.Background(), query, coffee.Name, coffee.Price)
+	log.Print("Values: ", coffee.Name, coffee.Price)
 }
 
 func (storage *CoffeeStorage) GetAll() []model.Coffee {
