@@ -35,7 +35,11 @@ func (controller *CoffeeController) FindById(response http.ResponseWriter, reque
 	checkError(response, err)
 
 	coffee, err = controller.service.FindById(id)
-	checkError(response, err)
+	if err != nil {
+		log.Println("Parse error: ", err)
+		WrapError(response, err)
+		return
+	}
 
 	var message = map[string]interface{}{
 		"status": "ok",

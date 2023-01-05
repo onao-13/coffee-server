@@ -21,7 +21,7 @@ func NewCoffeeStorage(pool *pgxpool.Pool) *CoffeeStorage {
 
 func (storage *CoffeeStorage) FindById(id int64) (model.Coffee, error) {
 	var coffee model.Coffee
-	query := "SELECT * FROM coffee WHERE id := $1"
+	query := "SELECT * FROM coffee WHERE id = $1"
 
 	err := pgxscan.Get(context.Background(), storage.pool, &coffee, query, id)
 
