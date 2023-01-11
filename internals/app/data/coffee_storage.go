@@ -21,7 +21,7 @@ func NewCoffeeStorage(pool *pgxpool.Pool) *CoffeeStorage {
 
 func (storage *CoffeeStorage) FindById(id int64) (model.Coffee, error) {
 	var coffee model.Coffee
-	query := "SELECT * FROM coffee WHERE id = $1"
+	query := "SELECT * FROM coffees WHERE id = $1"
 
 	err := pgxscan.Get(context.Background(), storage.pool, &coffee, query, id)
 
@@ -37,7 +37,7 @@ func (storage *CoffeeStorage) AddNew(coffee model.Coffee) error {
 	ctx := context.Background()
 	tx, err := storage.pool.Begin(ctx)
 
-	query := "INSERT INTO coffee (name, price) VALUES($1, $2)"
+	query := "INSERT INTO coffees (name, price) VALUES($1, $2)"
 	_, err = tx.Exec(context.Background(), query, coffee.Name, coffee.Price)
 	if err != nil {
 		log.Println("Error added data")
@@ -59,7 +59,7 @@ func (storage *CoffeeStorage) AddNew(coffee model.Coffee) error {
 func (storage *CoffeeStorage) GetAll() []model.Coffee {
 	var coffeeList []model.Coffee
 
-	query := "SELECT * FROM coffee"
+	query := "SELECT * FROM coffees"
 
 	err := pgxscan.Select(context.Background(), storage.pool, &coffeeList, query)
 	if err != nil {
